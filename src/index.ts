@@ -8,7 +8,13 @@ export const name = 'coc-dnd-dice'
 
 export const usage = `
 <div style="border-radius: 10px; border: 1px solid #ddd; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-  <h2 style="margin-top: 0; color: #4a6ee0;">📌 插件说明</h2>
+  <h2 style="margin-top: 0; color: #e08a4a;">🍊 关于本修改版</h2>
+  <p>本插件是 <a href="https://github.com/YisRime/koishi-plugin-coc-dnd-dice" style="color:#e08a4a;text-decoration:none;">YisRime 原版</a> 的修改版：掷出成功等级时，会在检定结果之后追加 <code>success_levels.json</code> 中对应的文本。</p>
+  <p>📦 <strong>本修改版仓库</strong>：<a href="https://github.com/OrangeKoishi/coc-dnd-dice-orange" style="color:#e08a4a;text-decoration:none;">OrangeKoishi/coc-dnd-dice-orange</a>（问题反馈请提交到这里）</p>
+</div>
+
+<div style="border-radius: 10px; border: 1px solid #ddd; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+  <h2 style="margin-top: 0; color: #4a6ee0;">📌 插件说明（原作者 YisRime）</h2>
   <p>📖 <strong>使用文档</strong>：请点击左上角的 <strong>插件主页</strong> 查看插件使用文档</p>
   <p>🔍 <strong>更多插件</strong>：可访问 <a href="https://github.com/YisRime" style="color:#4a6ee0;text-decoration:none;">苡淞的 GitHub</a> 查看本人的所有插件</p>
 </div>
@@ -145,12 +151,15 @@ export function apply(ctx: Context, config: Config) {
       const successLevel = getSuccessLevel(rollValue, targetValue)
 
       const format = Template.getTemplate('check_results', 'format') || '{player} 进行{skill}检定：d100={roll}/{target} {result}'
-      return format
+      const output = format
         .replace('{player}', session.username)
         .replace('{skill}', skill)
         .replace('{roll}', rollValue.toString())
         .replace('{target}', targetValue.toString())
         .replace('{result}', successLevel)
+
+      // 追加当前成功等级对应的文本
+      return output + Template.getSuccessLevelSuffix(successLevel)
     })
 
   // 代替检定命令
@@ -176,13 +185,16 @@ export function apply(ctx: Context, config: Config) {
       const cleanSubstitute = substitute.replace(/^@/, '')
 
       const format = Template.getTemplate('check_results', 'format_proxy') || '{player} 代替 {target} 进行{skill}检定：d100={roll}/{targetValue} {result}'
-      return format
+      const output = format
         .replace('{player}', session.username)
         .replace('{target}', cleanSubstitute)
         .replace('{skill}', skill)
         .replace('{roll}', rollValue.toString())
         .replace('{targetValue}', targetValue.toString())
         .replace('{result}', successLevel)
+
+      // 追加当前成功等级对应的文本
+      return output + Template.getSuccessLevelSuffix(successLevel)
     })
 
   // 设置默认骰子面数

@@ -331,12 +331,15 @@ ${allAttrList}
         const successLevel = this.getSuccessLevel(rollValue, skillValue)
 
         const format = Template.getTemplate('check_results', 'format') || '{player} 进行{skill}检定：d100={roll}/{target} {result}'
-        return format
+        const output = format
           .replace('{player}', activeCard.name)
           .replace('{skill}', skill)
           .replace('{roll}', rollValue.toString())
           .replace('{target}', skillValue.toString())
           .replace('{result}', successLevel)
+
+        // 追加当前成功等级对应的文本
+        return output + Template.getSuccessLevelSuffix(successLevel)
       })
 
     // 技能初始化命令

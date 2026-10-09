@@ -94,8 +94,8 @@ export class COC7GameLogic {
         const opponentName = opponent ? opponent.replace(/^@/, '') : 'AI'
 
         return `${session.username}(${skill1}) VS ${opponentName}(${skill2})
-${session.username}：d100=${result.roll1} ${result.result1}
-${opponentName}：d100=${result.roll2} ${result.result2}
+${session.username}：d100=${result.roll1} ${result.result1}${Template.getSuccessLevelSuffix(result.result1)}
+${opponentName}：d100=${result.roll2} ${result.result2}${Template.getSuccessLevelSuffix(result.result2)}
 结果：${result.winner}`
       })
 
@@ -129,7 +129,7 @@ ${opponentName}：d100=${result.roll2} ${result.result2}
         const result = this.bonusRoll(targetValue, bonusCount)
         return `${session.username} 进行${skill}检定(${bonusCount}个奖励骰)：
 主骰：${result.roll} 奖励骰：[${result.bonusDice.join(',')}]
-最终结果：d100=${result.finalRoll}/${targetValue} ${result.result}`
+最终结果：d100=${result.finalRoll}/${targetValue} ${result.result}${Template.getSuccessLevelSuffix(result.result)}`
       })
 
     // 惩罚骰检定
@@ -162,7 +162,7 @@ ${opponentName}：d100=${result.roll2} ${result.result2}
         const result = this.penaltyRoll(targetValue, penaltyCount)
         return `${session.username} 进行${skill}检定(${penaltyCount}个惩罚骰)：
 主骰：${result.roll} 惩罚骰：[${result.penaltyDice.join(',')}]
-最终结果：d100=${result.finalRoll}/${targetValue} ${result.result}`
+最终结果：d100=${result.finalRoll}/${targetValue} ${result.result}${Template.getSuccessLevelSuffix(result.result)}`
       })
 
     // 即时疯狂症状

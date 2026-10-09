@@ -135,13 +135,15 @@ const DEFAULT_TEMPLATES = {
     }
   },
 
-  // 成功等级文本
+  // 成功等级附加文本
+  // 键为成功等级，掷出该等级时会在原检定输出之后追加对应的文本
+  // 注意：「困难成功」未单独列出时沿用「成功」的文本
   success_levels: {
-    '大成功': '大成功',
-    '极难成功': '极难成功',
-    '成功': '成功',
-    '失败': '失败',
-    '大失败': '大失败'
+    '大成功': '大成功?! ...别用那种眼神看我!就算这样子,我也不会夸奖你...呜~仅限这一次,了不起了不起--',
+    '极难成功': '极难成功 虽说如此,也不能掉以轻心,要是松懈下来危险马上会接踵而至的 ',
+    '成功': '成功 哼,这种程度也是理所当然的吧',
+    '失败': '失败 就是因为你粗心大意,才会有这种结果,还不给我反省',
+    '大失败': '大失败!? 啊~~!!!你这个笨蛋!你到底在干什么啊!一定都怪你平常没行善积德!你这个笨蛋!你这个笨蛋!你这个笨蛋!'
   },
 
   // 系统文本
@@ -290,11 +292,46 @@ const DEFAULT_TEMPLATES = {
 export class Template {
   private static loadedTemplates: Map<string, any> = new Map()
 
+  // 成功等级别名：找不到同名键时按顺序回退
+  private static readonly SUCCESS_LEVEL_ALIASES: Record<string, string[]> = {
+    '大成功': ['大成功'],
+    '极难成功': ['极难成功'],
+    '困难成功': ['困难成功', '成功'],
+    '常规成功': ['常规成功', '成功'],
+    '成功': ['成功'],
+    '失败': ['失败'],
+    '大失败': ['大失败']
+  }
+
   // 初始化模板目录
   static init(dataDir: string) {
     TEMPLATE_DIR = path.join(dataDir, 'templates')
     this.ensureTemplateDir()
+    this.migrateLegacyTemplates()
     this.exportDefaultTemplates()
+  }
+
+  // 迁移旧版模板文件
+  // 旧版 success_levels 模板中每个等级的值只是等级名本身（占位），升级时替换为内置附加文本
+  static migrateLegacyTemplates() {
+    const filePath = path.join(TEMPLATE_DIR, 'success_levels.json')
+    if (!fs.existsSync(filePath)) return
+
+    try {
+      const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+      const isLegacyPlaceholder = content
+        && typeof content === 'object'
+        && !Array.isArray(content)
+        && Object.keys(content).length > 0
+        && Object.entries(content).every(([key, value]) => value === key)
+
+      if (isLegacyPlaceholder) {
+        fs.writeFileSync(filePath, JSON.stringify(DEFAULT_TEMPLATES.success_levels, null, 2), 'utf-8')
+        this.loadedTemplates.delete('success_levels')
+      }
+    } catch (error) {
+      console.error('迁移模板文件 success_levels 失败:', error)
+    }
   }
 
   static ensureTemplateDir() {
@@ -369,6 +406,26 @@ export class Template {
       }
     }
     return current
+  }
+
+  // 获取成功等级对应的附加文本（未配置时返回空字符串）
+  static getSuccessLevelText(level: string): string {
+    const template = this.getTemplate('success_levels')
+    if (!template || typeof template !== 'object') return ''
+
+    const keys = this.SUCCESS_LEVEL_ALIASES[level] || [level]
+    for (const key of keys) {
+      const text = template[key]
+      if (typeof text === 'string' && text.trim()) return text
+    }
+
+    return ''
+  }
+
+  // 获取成功等级附加文本的后缀（未配置时返回空字符串，否则为换行 + 文本）
+  static getSuccessLevelSuffix(level: string): string {
+    const text = this.getSuccessLevelText(level)
+    return text ? `\n${text}` : ''
   }
 
   // 列出所有模板

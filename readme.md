@@ -1,8 +1,23 @@
-# koishi-plugin-coc-dnd-dice
+# koishi-plugin-coc-dnd-dice-orange
 
-[![npm](https://img.shields.io/npm/v/koishi-plugin-coc-dnd-dice?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-coc-dnd-dice)
+[![npm](https://img.shields.io/npm/v/koishi-plugin-coc-dnd-dice-orange?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-coc-dnd-dice-orange)
 
-多功能跑团（TRPG）骰点插件，内置对《克苏鲁的呼唤》（CoC7）和《龙与地下城》（D&D5E）等多种规则的支持。
+修改版多功能跑团（TRPG）骰点插件，原作者YisRime
+
+> **这是修改版**
+>
+> - 原版：[YisRime/koishi-plugin-coc-dnd-dice](https://github.com/YisRime/koishi-plugin-coc-dnd-dice)，作者 Yis_Rime <yis_rime@outlook.com>
+> - 本修改版仓库：[OrangeKoishi/coc-dnd-dice-orange](https://github.com/OrangeKoishi/coc-dnd-dice-orange)
+> - 相对原版的改动：掷出成功等级时，会在检定结果之后追加 `success_levels.json` 中对应的文本（见下文〈成功等级文本〉）
+> - 许可证：与原版一致，[AGPL-3.0-only](./LICENSE)
+
+## 📦 安装
+
+在 Koishi 控制台的「插件市场」中搜索 `coc-dnd-dice-orange` 安装，或使用命令行：
+
+```sh
+npm i koishi-plugin-coc-dnd-dice-orange
+```
 
 ## ✨ 功能特性
 
@@ -101,5 +116,23 @@
 1. **导出默认模板**：使用命令 `.template.export`，插件会将所有内置模板导出为 `.json` 文件，存放在 Koishi 数据目录下的 `templates` 文件夹内。
 2. **修改或创建模板**：你可以直接编辑这些导出的 JSON 文件，或者创建新的模板文件。例如，你可以修改 `coc7_skills.json` 来调整技能初始值，或者创建一个 `my_house_rules.json` 来定义自己的房规。
 3. **重载模板**：修改文件后，使用 `.template.reload` 命令，插件会清除缓存并加载你的自定义设置，使其立即生效。
+
+### 成功等级文本（`success_levels.json`）
+
+`success_levels.json` 以成功等级为键，用来配置掷出该等级时追加在检定结果之后的文本：
+
+```json
+{
+  "大成功": "大成功?! ...别用那种眼神看我!",
+  "极难成功": "极难成功 虽说如此,也不能掉以轻心",
+  "成功": "成功 哼,这种程度也是理所当然的吧",
+  "失败": "失败 就是因为你粗心大意,才会有这种结果",
+  "大失败": "大失败!? 啊~~!!!你这个笨蛋!"
+}
+```
+
+- 生效范围：`.ra`（含代替检定）、角色卡的 `.ra`、`.rab`、`.rap`、`.rav`。
+- 「困难成功」和「常规成功」在模板中没有同名键时，会沿用「成功」的文本。
+- 某个等级没有配置（或值为空字符串）时，该等级不会追加任何内容。
 
 这种设计让你可以轻松地将任何跑团规则的数据集成到插件中，并与你的跑团团队共享。

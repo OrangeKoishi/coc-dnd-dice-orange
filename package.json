@@ -1,28 +1,73 @@
 {
-  "name": "koishi-plugin-coc-dnd-dice",
-  "description": "多功能跑团（TRPG）骰点插件，内置对《克苏鲁的呼唤》（CoC7）和《龙与地下城》（D&D5E）等多种规则的支持。",
-  "version": "1.0.4",
+  "name": "koishi-plugin-coc-dnd-dice-orange",
+  "version": "1.1.0",
+  "description": "基于 YisRime 原版 koishi-plugin-coc-dnd-dice 的修改版：掷出成功等级时会在原检定结果后追加对应文本，并附带若干修复。",
+  "author": "orangerain <1378991200@qq.com>",
   "contributors": [
-    "Yis_Rime <yis_rime@outlook.com>"
+    {
+      "name": "Yis_Rime",
+      "email": "yis_rime@outlook.com"
+    },
+    {
+      "name": "orangerain",
+      "email": "1378991200@qq.com"
+    }
   ],
-  "homepage": "https://github.com/YisRime/koishi-plugin-coc-dnd-dice",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/OrangeKoishi/coc-dnd-dice-orange",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YisRime/koishi-plugin-coc-dnd-dice.git"
+    "url": "git+https://github.com/OrangeKoishi/coc-dnd-dice-orange.git"
   },
+  "bugs": {
+    "url": "https://github.com/OrangeKoishi/coc-dnd-dice-orange/issues"
+  },
+  "keywords": [
+    "chatbot",
+    "koishi",
+    "plugin",
+    "coc",
+    "coc7",
+    "dnd",
+    "dnd5e",
+    "trpg",
+    "dice",
+    "跑团",
+    "骰子"
+  ],
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
     "lib",
-    "dist"
+    "dist",
+    "src"
   ],
-  "license": "AGPL-3.0-only",
-  "keywords": [
-    "chatbot",
-    "koishi",
-    "plugin"
-  ],
+  "scripts": {
+    "build": "npm run clean && npm run build:js && npm run build:dts",
+    "build:js": "esbuild src/index.ts --bundle --platform=node --target=node18 --format=cjs --outfile=lib/index.js --external:koishi",
+    "build:dts": "tsc -b tsconfig.json --force",
+    "clean": "node -e \"const fs=require('fs');fs.rmSync('lib',{recursive:true,force:true});fs.rmSync('tsconfig.tsbuildinfo',{force:true})\"",
+    "prepublishOnly": "npm run build",
+    "pub": "npm publish --registry https://registry.npmjs.org"
+  },
   "peerDependencies": {
     "koishi": "^4.18.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "esbuild": "^0.28.2",
+    "koishi": "^4.18.8",
+    "typescript": "^5.9.2",
+    "yml-register": "^1.2.5"
+  },
+  "koishi": {
+    "description": {
+      "zh": "基于 YisRime 原版 koishi-plugin-coc-dnd-dice 的修改版 CoC7 / D&D5E 跑团骰点插件，掷出成功等级时会在检定结果后追加对应文本。",
+      "en": "Modified CoC7 / D&D5E TRPG dice plugin based on YisRime's original, appending flavor text for each success level."
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   }
 }
